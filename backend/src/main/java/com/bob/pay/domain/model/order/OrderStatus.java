@@ -1,0 +1,17 @@
+package com.bob.pay.domain.model.order;
+
+public enum OrderStatus {
+    WAITING_PAYMENT,
+    PAID_TO_MERCHANT,
+    WAITING_TECHNICIAN_ACCEPT,
+    TECHNICIAN_ACCEPTED,
+    CONTACTED_CUSTOMER,
+    ON_THE_WAY,
+    ARRIVED,
+    CLOCKED_IN,
+    CLOCKED_OUT,
+    FINISHED,
+    REFUND_REQUESTED,
+    REFUNDED,
+    CANCELLED
+}
