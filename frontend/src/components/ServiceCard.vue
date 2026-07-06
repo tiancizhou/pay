@@ -2,8 +2,8 @@
   <article class="service-card">
     <button class="service-card__main" @click="$emit('view', service)">
       <div class="service-card__image-wrap">
-      <img class="service-card__image" :src="service.imageUrl" :alt="service.name">
-      <span class="service-card__duration">◷ {{ service.durationMinutes }}分钟</span>
+        <img class="service-card__image" :src="service.imageUrl" :alt="service.name">
+        <span class="service-card__duration">◷ {{ service.durationMinutes }}分钟</span>
       </div>
       <div class="service-card__body">
         <h3>{{ service.name }}</h3>
@@ -15,7 +15,9 @@
         </div>
       </div>
     </button>
-    <button class="pill-button" @click="$emit('select', service)">选择商户</button>
+    <footer class="service-card__footer">
+      <button class="pill-button" @click="$emit('select', service)">选择商户</button>
+    </footer>
   </article>
 </template>
 

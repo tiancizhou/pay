@@ -3,19 +3,19 @@
     <slot />
     <nav v-if="tabbar" class="tabbar">
       <RouterLink to="/client" class="tabbar__item">
-        <span>⌂</span>
+        <van-icon name="wap-home-o" />
         首页
       </RouterLink>
       <RouterLink :to="merchantRoute" class="tabbar__item">
-        <span>♟</span>
+        <van-icon name="friends-o" />
         商户
       </RouterLink>
       <RouterLink to="/client/orders" class="tabbar__item">
-        <span>▤</span>
+        <van-icon name="orders-o" />
         订单
       </RouterLink>
       <RouterLink to="/client/profile" class="tabbar__item">
-        <span>●</span>
+        <van-icon name="manager-o" />
         我的
       </RouterLink>
     </nav>

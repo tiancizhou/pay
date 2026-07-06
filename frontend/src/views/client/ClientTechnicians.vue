@@ -24,11 +24,12 @@
         <button class="location-guide__fill" @click="router.push('/client/addresses?from=technicians')">去填写地址</button>
       </section>
 
-      <LocationBar v-else />
-
       <section class="phone-strip">
-        <span>▰ 本地商家客服电话： {{ merchantServicePhone }}</span>
-        <button @click="callMerchantService">☏ 拨打</button>
+        <div>
+          <span>本地商家客服电话</span>
+          <strong>{{ merchantServicePhone }}</strong>
+        </div>
+        <button @click="callMerchantService">拨打</button>
       </section>
 
       <section v-if="canShowTechnicians" class="technician-list">
@@ -48,7 +49,7 @@
         <button :disabled="locating" @click="refreshLocation">{{ locating ? '定位中...' : '去开启' }}</button>
       </section>
     </section>
-    <div v-if="toast" class="toast">{{ toast }}</div>
+    <div v-if="toast" class="toast toast--inline">{{ toast }}</div>
   </MobileShell>
 </template>
 
@@ -56,10 +57,9 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import MobileShell from '../../components/MobileShell.vue'
-import LocationBar from '../../components/LocationBar.vue'
 import TechnicianCard from '../../components/TechnicianCard.vue'
 import { api } from '../../services/api'
-import { cityFromRegion, locate, locationPartsFromRegion } from '../../services/location'
+import { addressFieldsFromLocationLabel, cityFromRegion, locate, locationPartsFromRegion } from '../../services/location'
 import { booking } from '../../state/booking'
 
 const route = useRoute()
@@ -102,9 +102,10 @@ async function refreshLocation() {
   try {
     booking.customerLocation = await locate('当前位置')
     guideDismissed.value = true
-    booking.address.region = booking.customerLocation.label
-    if (!booking.address.detail) {
-      booking.address.detail = booking.customerLocation.label
+    const fields = addressFieldsFromLocationLabel(booking.customerLocation.label)
+    booking.address.region = fields.region
+    if (fields.detail && !booking.address.detail) {
+      booking.address.detail = fields.detail
     }
     technicians.value = await api.listTechnicians(route.params.serviceId, booking.customerLocation)
     toast.value = `定位成功：${booking.customerLocation.label}`

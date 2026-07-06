@@ -9,10 +9,12 @@
         <span>电话</span>
         <input v-model="form.phone" placeholder="手机号">
       </label>
-      <label>
+      <label class="address-panel__location-row">
         <span>所在地区</span>
         <input v-model="form.region" placeholder="请选择地区">
-        <button type="button" class="inline-location" @click="fillLocation">定位</button>
+        <button type="button" class="inline-location" :disabled="locating" @click="fillLocation">
+          {{ locating ? '定位中' : '定位' }}
+        </button>
       </label>
       <label>
         <span>详细地址</span>
@@ -36,15 +38,16 @@
 </template>
 
 <script setup>
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import MobileShell from '../../components/MobileShell.vue'
-import { locate } from '../../services/location'
+import { addressFieldsFromLocationLabel, locate } from '../../services/location'
 import { booking, upsertAddress } from '../../state/booking'
 
 const router = useRouter()
 const route = useRoute()
 const editingAddress = booking.addresses.find((item) => item.id === route.query.id)
+const locating = ref(false)
 const form = reactive({
   id: editingAddress?.id,
   contactName: editingAddress?.contactName ?? booking.address.contactName,
@@ -67,10 +70,16 @@ function returnPath() {
 }
 
 async function fillLocation() {
-  booking.customerLocation = await locate('用户定位')
-  form.region = booking.customerLocation.label
-  if (!form.detail) {
-    form.detail = '请补充门牌、楼层等信息'
+  locating.value = true
+  try {
+    booking.customerLocation = await locate('当前位置')
+    const fields = addressFieldsFromLocationLabel(booking.customerLocation.label)
+    form.region = fields.region
+    if (fields.detail) {
+      form.detail = fields.detail
+    }
+  } finally {
+    locating.value = false
   }
 }
 </script>

@@ -36,10 +36,10 @@ async function withAddressLabel(point) {
     const data = await response.json()
     return {
       ...point,
-      label: formatAddress(data) || point.label
+      label: formatAddress(data) || fallbackLabel(point.label)
     }
   } catch {
-    return point
+    return { ...point, label: fallbackLabel(point.label) }
   }
 }
 
@@ -50,27 +50,44 @@ function formatAddress(data) {
     address.city_district,
     address.district
   )
-  const area = firstPresent(
-    address.suburb,
-    address.neighbourhood,
-    address.quarter
-  )
   const city = firstPresent(
     address.city,
-    address.town,
-    cityFromDevelopmentZone(area, district),
+    address.municipality,
+    address.prefecture,
     cityFromDevelopmentZone(district, district)
   )
+  const area = firstPresent(
+    address.suburb,
+    address.town,
+    address.village,
+    address.neighbourhood,
+    address.quarter,
+    address.residential
+  )
   const parts = [
-    address.state,
+    address.state || address.province,
     city,
     district,
     area,
     address.road,
+    address.pedestrian,
     address.house_number
   ].filter(Boolean)
   const formatted = parts.length ? uniqueParts(parts).join('') : data?.display_name
   return normalizeRegionLabel(formatted)
+}
+
+export function addressFieldsFromLocationLabel(label) {
+  const value = normalizeRegionLabel(compactAddressLabel(label))
+  if (!value || isGenericLocationLabel(value)) {
+    return { region: FALLBACK_LOCATION.label, detail: '' }
+  }
+
+  const { region, rest } = splitAdministrativeRegion(value)
+  return {
+    region: region || value,
+    detail: cleanAddressDetail(rest)
+  }
 }
 
 export function cityFromRegion(region) {
@@ -142,4 +159,56 @@ function uniqueParts(parts) {
     seen.add(part)
     return true
   })
+}
+
+function splitAdministrativeRegion(value) {
+  let rest = value
+  const parts = []
+  const directCity = rest.match(/^(北京市|天津市|上海市|重庆市|香港特别行政区|澳门特别行政区)/)?.[1]
+  if (directCity) {
+    parts.push(directCity)
+    rest = rest.slice(directCity.length)
+  } else {
+    const province = rest.match(/^(.+?(?:省|自治区|特别行政区))/)?.[1]
+    if (province) {
+      parts.push(province)
+      rest = rest.slice(province.length)
+    }
+
+    const city = rest.match(/^(.+?(?:市|自治州|地区|盟))/)?.[1]
+    if (city) {
+      parts.push(city)
+      rest = rest.slice(city.length)
+    }
+  }
+
+  const district = rest.match(/^(.+?(?:区|县|旗|市))/)?.[1]
+  if (district) {
+    parts.push(district)
+    rest = rest.slice(district.length)
+  }
+
+  return {
+    region: parts.join(''),
+    rest
+  }
+}
+
+function cleanAddressDetail(value = '') {
+  return value
+    .replace(/^(?:中国|中华人民共和国)/, '')
+    .replace(/^[,，、\s]+/, '')
+    .trim()
+}
+
+function compactAddressLabel(value = '') {
+  return value.replace(/\s+/g, '').replace(/[,，]+/g, '')
+}
+
+function fallbackLabel(label) {
+  return isGenericLocationLabel(label) ? FALLBACK_LOCATION.label : label
+}
+
+function isGenericLocationLabel(label = '') {
+  return ['当前位置', '用户定位', '技师当前位置'].includes(label)
 }

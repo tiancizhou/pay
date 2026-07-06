@@ -13,7 +13,7 @@
 
 <script setup>
 import { computed, ref } from 'vue'
-import { cityFromRegion, locate } from '../services/location'
+import { addressFieldsFromLocationLabel, cityFromRegion, locate } from '../services/location'
 import { booking } from '../state/booking'
 
 const loading = ref(false)
@@ -29,9 +29,10 @@ async function refresh() {
   toast.value = '正在获取定位，请允许浏览器定位权限'
   try {
     booking.customerLocation = await locate('当前位置')
-    booking.address.region = booking.customerLocation.label
-    if (!booking.address.detail) {
-      booking.address.detail = booking.customerLocation.label
+    const fields = addressFieldsFromLocationLabel(booking.customerLocation.label)
+    booking.address.region = fields.region
+    if (fields.detail && !booking.address.detail) {
+      booking.address.detail = fields.detail
     }
     toast.value = `定位成功：${booking.customerLocation.label}`
   } finally {
