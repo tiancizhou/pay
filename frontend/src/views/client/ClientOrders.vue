@@ -1,53 +1,55 @@
 <template>
   <MobileShell>
-    <section class="client-tabs">
-      <button
-        v-for="tab in orderTabs"
-        :key="tab.key"
-        :class="{ active: activeTab === tab.key }"
-        @click="activeTab = tab.key"
-      >
-        {{ tab.label }}
-      </button>
-    </section>
+    <section class="client-tab-page">
+      <section class="client-tabs">
+        <button
+          v-for="tab in orderTabs"
+          :key="tab.key"
+          :class="{ active: activeTab === tab.key }"
+          @click="activeTab = tab.key"
+        >
+          {{ tab.label }}
+        </button>
+      </section>
 
-    <section v-if="filteredOrders.length" class="order-list">
-      <article v-for="order in filteredOrders" :key="order.id" class="order-card">
-        <header>
-          <strong>温暖到家 · {{ statusText[order.status] ?? order.status }}</strong>
-          <span>¥ {{ Number(order.payableAmount).toFixed(2) }}</span>
-        </header>
-        <p>{{ order.address.region }} {{ order.address.detail }}</p>
-        <p>预约时间：{{ order.serviceTime }} · 技师：{{ order.technicianId }}</p>
-        <div class="order-progress">
-          <span
-            v-for="node in flowNodes"
-            :key="node.status"
-            :class="{ done: isDone(order, node.status), current: order.status === node.status }"
-          >
-            {{ node.label }}
-          </span>
-        </div>
-        <p v-if="order.customerLocation" class="location-line">
-          用户定位：{{ order.customerLocation.label }}
-        </p>
-        <p v-if="order.technicianLocation" class="location-line">
-          技师定位：{{ order.technicianLocation.label }}
-        </p>
-        <footer class="order-actions">
-          <button v-if="order.status === 'WAITING_PAYMENT'" @click="pay(order)">模拟支付</button>
-          <button v-if="canCancel(order)" class="secondary" @click="cancel(order)">取消订单</button>
-          <button v-if="canRefund(order)" class="secondary" @click="refund(order)">申请退款</button>
-          <button @click="refreshLocation(order)">更新定位</button>
-          <button class="secondary" @click="showTimeline(order)">查看进度</button>
-        </footer>
-      </article>
-    </section>
+      <section v-if="filteredOrders.length" class="order-list">
+        <article v-for="order in filteredOrders" :key="order.id" class="order-card">
+          <header>
+            <strong>{{ statusText[order.status] ?? order.status }}</strong>
+            <span>¥ {{ Number(order.payableAmount).toFixed(2) }}</span>
+          </header>
+          <p>{{ order.address.region }} {{ order.address.detail }}</p>
+          <p>预约时间：{{ order.serviceTime }} · 技师：{{ order.technicianId }}</p>
+          <div class="order-progress">
+            <span
+              v-for="node in flowNodes"
+              :key="node.status"
+              :class="{ done: isDone(order, node.status), current: order.status === node.status }"
+            >
+              {{ node.label }}
+            </span>
+          </div>
+          <p v-if="order.customerLocation" class="location-line">
+            用户定位：{{ order.customerLocation.label }}
+          </p>
+          <p v-if="order.technicianLocation" class="location-line">
+            技师定位：{{ order.technicianLocation.label }}
+          </p>
+          <footer class="order-actions">
+            <button v-if="order.status === 'WAITING_PAYMENT'" @click="pay(order)">模拟支付</button>
+            <button v-if="canCancel(order)" class="secondary" @click="cancel(order)">取消订单</button>
+            <button v-if="canRefund(order)" class="secondary" @click="refund(order)">申请退款</button>
+            <button @click="refreshLocation(order)">更新定位</button>
+            <button class="secondary" @click="showTimeline(order)">查看进度</button>
+          </footer>
+        </article>
+      </section>
 
-    <section v-else class="empty-orders">
-      <div class="empty-illustration">▱</div>
-      <p>暂无订单</p>
-      <button @click="router.push('/client')">去预约服务</button>
+      <section v-else class="empty-orders">
+        <div class="empty-illustration">▱</div>
+        <p>暂无订单</p>
+        <button @click="router.push('/client')">去预约服务</button>
+      </section>
     </section>
 
     <div v-if="toast" class="toast">{{ toast }}</div>

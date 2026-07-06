@@ -2,12 +2,16 @@ package com.bob.pay.interfaces.web;
 
 import com.bob.pay.application.OrderApplicationService;
 import com.bob.pay.application.ServiceCatalogApplicationService;
+import com.bob.pay.application.SiteSettingsApplicationService;
 import com.bob.pay.application.TechnicianApplicationService;
+import com.bob.pay.application.UserApplicationService;
 import com.bob.pay.domain.model.order.GeoPoint;
 import com.bob.pay.domain.model.order.Order;
 import com.bob.pay.domain.model.service.ServiceItem;
 import com.bob.pay.domain.model.technician.Technician;
+import com.bob.pay.domain.model.user.AppUser;
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,15 +29,34 @@ public class ClientApiController {
     private final ServiceCatalogApplicationService serviceCatalogApplicationService;
     private final TechnicianApplicationService technicianApplicationService;
     private final OrderApplicationService orderApplicationService;
+    private final SiteSettingsApplicationService siteSettingsApplicationService;
+    private final UserApplicationService userApplicationService;
 
     public ClientApiController(
             ServiceCatalogApplicationService serviceCatalogApplicationService,
             TechnicianApplicationService technicianApplicationService,
-            OrderApplicationService orderApplicationService
+            OrderApplicationService orderApplicationService,
+            SiteSettingsApplicationService siteSettingsApplicationService,
+            UserApplicationService userApplicationService
     ) {
         this.serviceCatalogApplicationService = serviceCatalogApplicationService;
         this.technicianApplicationService = technicianApplicationService;
         this.orderApplicationService = orderApplicationService;
+        this.siteSettingsApplicationService = siteSettingsApplicationService;
+        this.userApplicationService = userApplicationService;
+    }
+
+    @GetMapping("/me")
+    public AppUser me(
+            @RequestParam(required = false) String userId,
+            @RequestHeader(value = "X-Demo-User-Id", required = false) String headerUserId
+    ) {
+        return userApplicationService.currentUser(userId == null || userId.isBlank() ? headerUserId : userId);
+    }
+
+    @GetMapping("/site-settings")
+    public SiteSettingsApplicationService.SiteSettings siteSettings() {
+        return siteSettingsApplicationService.getSettings();
     }
 
     @GetMapping("/services")

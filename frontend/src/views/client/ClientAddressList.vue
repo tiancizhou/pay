@@ -1,6 +1,5 @@
 <template>
   <MobileShell :tabbar="false">
-    <WechatChrome />
     <section class="address-list-page">
       <header>
         <h1>地址管理</h1>
@@ -34,7 +33,6 @@
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import MobileShell from '../../components/MobileShell.vue'
-import WechatChrome from '../../components/WechatChrome.vue'
 import { booking, selectAddress, upsertAddress } from '../../state/booking'
 
 const route = useRoute()

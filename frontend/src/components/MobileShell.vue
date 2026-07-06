@@ -1,5 +1,5 @@
 <template>
-  <main class="mobile-shell" :class="{ 'with-tabbar': tabbar }">
+  <main ref="shellRef" class="mobile-shell" :class="{ 'with-tabbar': tabbar }">
     <slot />
     <nav v-if="tabbar" class="tabbar">
       <RouterLink to="/client" class="tabbar__item">
@@ -23,7 +23,8 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { booking } from '../state/booking'
 
 defineProps({
@@ -34,4 +35,10 @@ defineProps({
 })
 
 const merchantRoute = computed(() => `/client/services/${booking.service?.id ?? 'tuina'}/technicians`)
+const route = useRoute()
+const shellRef = ref(null)
+
+watch(() => route.fullPath, () => {
+  shellRef.value?.scrollTo({ top: 0 })
+})
 </script>

@@ -1,6 +1,5 @@
 <template>
   <MobileShell :tabbar="false">
-    <WechatChrome />
     <form class="address-panel" @submit.prevent="save">
       <label>
         <span>姓名</span>
@@ -40,7 +39,6 @@
 import { reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import MobileShell from '../../components/MobileShell.vue'
-import WechatChrome from '../../components/WechatChrome.vue'
 import { locate } from '../../services/location'
 import { booking, upsertAddress } from '../../state/booking'
 

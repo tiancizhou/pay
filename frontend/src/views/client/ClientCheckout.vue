@@ -1,6 +1,5 @@
 <template>
   <MobileShell :tabbar="false">
-    <WechatChrome />
     <section class="promise-strip">
       <span>✓ 不满意重复服务</span>
       <span>✓ 满意为止</span>
@@ -71,7 +70,6 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import MobileShell from '../../components/MobileShell.vue'
-import WechatChrome from '../../components/WechatChrome.vue'
 import { api } from '../../services/api'
 import { locate } from '../../services/location'
 import { statusText } from '../../services/status'

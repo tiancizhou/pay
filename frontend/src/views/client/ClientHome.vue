@@ -1,20 +1,22 @@
 <template>
   <MobileShell>
-    <LocationBar />
-    <section class="sort-bar">
-      <button :class="{ 'sort-bar__active': sortBy === 'default' }" @click="applySort('default')">综合排序</button>
-      <button :class="{ 'sort-bar__active': sortBy === 'price' }" @click="applySort('price')">价格 {{ priceAsc ? '↑' : '↓' }}</button>
-      <button :class="{ 'sort-bar__active': sortBy === 'sold' }" @click="applySort('sold')">销量 {{ soldAsc ? '↑' : '↓' }}</button>
-    </section>
+    <section class="client-tab-page">
+      <LocationBar />
+      <section class="sort-bar">
+        <button :class="{ 'sort-bar__active': sortBy === 'default' }" @click="applySort('default')">综合排序</button>
+        <button :class="{ 'sort-bar__active': sortBy === 'price' }" @click="applySort('price')">价格 {{ priceAsc ? '↑' : '↓' }}</button>
+        <button :class="{ 'sort-bar__active': sortBy === 'sold' }" @click="applySort('sold')">销量 {{ soldAsc ? '↑' : '↓' }}</button>
+      </section>
 
-    <section class="service-list">
-      <ServiceCard
-        v-for="service in services"
-        :key="service.id"
-        :service="service"
-        @select="selectService"
-        @view="viewService"
-      />
+      <section class="service-list">
+        <ServiceCard
+          v-for="service in services"
+          :key="service.id"
+          :service="service"
+          @select="selectService"
+          @view="viewService"
+        />
+      </section>
     </section>
   </MobileShell>
 </template>

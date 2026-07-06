@@ -1,7 +1,7 @@
 const FALLBACK_LOCATION = {
-  latitude: 29.3069,
-  longitude: 120.0751,
-  label: '浙江省金华市义乌市世俊路附近'
+  latitude: 31.701,
+  longitude: 119.943,
+  label: '江苏省常州市武进区'
 }
 
 export function locate(label = '当前位置') {
@@ -39,23 +39,107 @@ async function withAddressLabel(point) {
       label: formatAddress(data) || point.label
     }
   } catch {
-    return { ...point, label: FALLBACK_LOCATION.label }
+    return point
   }
 }
 
 function formatAddress(data) {
   const address = data?.address ?? {}
+  const district = firstPresent(
+    address.county,
+    address.city_district,
+    address.district
+  )
+  const area = firstPresent(
+    address.suburb,
+    address.neighbourhood,
+    address.quarter
+  )
+  const city = firstPresent(
+    address.city,
+    address.town,
+    cityFromDevelopmentZone(area, district),
+    cityFromDevelopmentZone(district, district)
+  )
   const parts = [
     address.state,
-    address.city || address.town || address.county,
-    address.suburb || address.city_district || address.district,
-    address.road || address.neighbourhood,
+    city,
+    district,
+    area,
+    address.road,
     address.house_number
   ].filter(Boolean)
-  return parts.length ? [...new Set(parts)].join('') : data?.display_name
+  const formatted = parts.length ? uniqueParts(parts).join('') : data?.display_name
+  return normalizeRegionLabel(formatted)
 }
 
 export function cityFromRegion(region) {
-  const match = region?.match(/([^省自治区]+市)/)
-  return match?.[1] ?? '当前位置'
+  return locationPartsFromRegion(region).city
+}
+
+export function normalizeRegionLabel(region) {
+  const value = region?.trim()
+  if (!value) return ''
+  if (directCityFromRegion(value)) return value
+
+  const district = parseDistrict(value)
+  const city = cityFromDevelopmentZone(value, district)
+  if (!city) return value
+
+  const state = value.match(/^(.+?(?:省|自治区|特别行政区))/)?.[1]
+  if (!state) return `${city}${value}`
+  return `${state}${city}${value.slice(state.length)}`
+}
+
+export function locationPartsFromRegion(region) {
+  const value = region?.trim()
+  if (!value) return { city: '当前位置', district: '请定位' }
+
+  const district = parseDistrict(value)
+  const city = parseCity(value, district)
+  return {
+    city: city || district || '当前位置',
+    district: district && district !== city ? district : '附近'
+  }
+}
+
+function parseCity(value, district = '') {
+  const directCity = directCityFromRegion(value)
+  if (directCity) return directCity
+
+  const developmentZoneCity = cityFromDevelopmentZone(value, district)
+  if (developmentZoneCity) return developmentZoneCity
+
+  return ''
+}
+
+function parseDistrict(value) {
+  const directDistrict = value.match(/([^省市区县]+(?:区|县|旗))/)
+  return directDistrict?.[1] ?? ''
+}
+
+function directCityFromRegion(value = '') {
+  const match = value.match(/([^省自治区市]+市)/)
+  return match?.[1] ?? ''
+}
+
+function cityFromDevelopmentZone(value = '', district = '') {
+  const match = value.match(/([^省市区县]+?)(?:经济技术开发区|经济开发区|高新技术产业开发区|高新区|开发区)/)
+  if (!match) return ''
+  const name = match[1].replace(/^(.*?省)?(.*?区)?/, '')
+  if (district && district.startsWith(name)) return ''
+  return name ? `${name}市` : ''
+}
+
+function firstPresent(...values) {
+  return values.find((value) => Boolean(value)) ?? ''
+}
+
+function uniqueParts(parts) {
+  const seen = new Set()
+  return parts.filter((part) => {
+    if (seen.has(part)) return false
+    seen.add(part)
+    return true
+  })
 }

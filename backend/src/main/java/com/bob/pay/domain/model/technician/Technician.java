@@ -31,4 +31,9 @@ public record Technician(
         return new Technician(id, name, level, distanceKm, servedOrders, likedCount, commentCount,
                 nextAvailableTime, newcomer, portraitUrl, nextLocation, serviceIds);
     }
+
+    public Technician withPortraitUrl(String nextPortraitUrl) {
+        return new Technician(id, name, level, distanceKm, servedOrders, likedCount, commentCount,
+                nextAvailableTime, newcomer, nextPortraitUrl, location, serviceIds);
+    }
 }

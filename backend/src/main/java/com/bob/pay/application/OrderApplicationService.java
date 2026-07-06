@@ -72,8 +72,19 @@ public class OrderApplicationService {
         return orderRepository.findAll();
     }
 
+    public List<Order> listOrdersByTechnician(String technicianId) {
+        return orderRepository.findAll().stream()
+                .filter(order -> order.technicianId().equals(technicianId))
+                .toList();
+    }
+
     public Order latestOrder() {
         return orderRepository.findAll().stream().findFirst()
+                .orElseGet(this::demoOrder);
+    }
+
+    public Order latestTechnicianOrder(String technicianId) {
+        return listOrdersByTechnician(technicianId).stream().findFirst()
                 .orElseGet(this::demoOrder);
     }
 

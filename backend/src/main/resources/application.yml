@@ -4,3 +4,22 @@ server:
 spring:
   application:
     name: dao-home
+  datasource:
+    url: "${DB_URL:jdbc:mysql://localhost:3306/dao_home?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&createDatabaseIfNotExist=true}"
+    username: "${DB_USERNAME:root}"
+    password: "${DB_PASSWORD:}"
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 6MB
+
+app:
+  upload-dir: ${user.dir}/uploads

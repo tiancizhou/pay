@@ -42,6 +42,11 @@ public class InMemoryServiceCatalogRepository implements ServiceCatalogRepositor
         return serviceItem;
     }
 
+    @Override
+    public boolean deleteById(String id) {
+        return services.removeIf(service -> service.id().equals(id));
+    }
+
     private static ServiceItem.ServiceDetail defaultDetail() {
         return new ServiceItem.ServiceDetail(
                 List.of("缓解肌肉紧张", "缓解身体疲劳", "舒筋通络", "改善亚健康"),

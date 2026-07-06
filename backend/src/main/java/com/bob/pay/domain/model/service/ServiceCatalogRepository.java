@@ -10,4 +10,6 @@ public interface ServiceCatalogRepository {
     Optional<ServiceItem> findById(String id);
 
     ServiceItem save(ServiceItem serviceItem);
+
+    boolean deleteById(String id);
 }

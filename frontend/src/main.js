@@ -1,7 +1,10 @@
 import { createApp } from 'vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import ElementPlus from 'element-plus'
+import zhCn from 'element-plus/es/locale/lang/zh-cn'
+import Vant from 'vant'
 import 'element-plus/dist/index.css'
+import 'vant/lib/index.css'
 import App from './App.vue'
 import ClientHome from './views/client/ClientHome.vue'
 import ClientTechnicians from './views/client/ClientTechnicians.vue'
@@ -13,10 +16,13 @@ import ClientOrders from './views/client/ClientOrders.vue'
 import ClientProfile from './views/client/ClientProfile.vue'
 import AdminDashboard from './views/admin/AdminDashboard.vue'
 import TechnicianHome from './views/technician/TechnicianHome.vue'
+import RoleEntry from './views/RoleEntry.vue'
+import AdminLogin from './views/admin/AdminLogin.vue'
+import { getAdminUser, getPortalUser, roleHome } from './services/auth'
 import './styles/main.css'
 
 const routes = [
-  { path: '/', redirect: '/client' },
+  { path: '/', component: RoleEntry },
   { path: '/client', component: ClientHome },
   { path: '/client/services/:serviceId', component: ClientServiceDetail },
   { path: '/client/services/:serviceId/technicians', component: ClientTechnicians },
@@ -25,6 +31,7 @@ const routes = [
   { path: '/client/profile', component: ClientProfile },
   { path: '/client/addresses', component: ClientAddressList },
   { path: '/client/address', component: ClientAddress },
+  { path: '/admin/login', component: AdminLogin },
   { path: '/admin', component: AdminDashboard },
   { path: '/technician', component: TechnicianHome }
 ]
@@ -35,4 +42,20 @@ const router = createRouter({
   scrollBehavior: () => ({ top: 0 })
 })
 
-createApp(App).use(router).use(ElementPlus).mount('#app')
+router.beforeEach((to) => {
+  if (to.path === '/') return true
+  if (to.path === '/admin/login') return true
+
+  if (to.path.startsWith('/admin')) {
+    const admin = getAdminUser()
+    return admin?.role === 'ADMIN' ? true : '/admin/login'
+  }
+
+  const user = getPortalUser()
+  if (!user?.role) return '/'
+  if (to.path.startsWith('/technician') && user.role !== 'TECHNICIAN') return roleHome(user)
+  if (to.path.startsWith('/client') && user.role !== 'CLIENT') return roleHome(user)
+  return true
+})
+
+createApp(App).use(router).use(ElementPlus, { locale: zhCn }).use(Vant).mount('#app')

@@ -50,7 +50,7 @@
               <li v-for="item in service.detail.contraindications" :key="item">{{ item }}</li>
             </ol>
           </DetailBlock>
-          <DetailBlock title="选择温暖到家的理由">
+          <DetailBlock title="选择本服务的理由">
             <div class="reason-card">
               <p v-for="item in service.detail.reasons" :key="item">{{ item }}</p>
             </div>
