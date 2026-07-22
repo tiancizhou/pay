@@ -23,3 +23,13 @@ spring:
 
 app:
   upload-dir: ${user.dir}/uploads
+
+wechat:
+  official-account:
+    enabled: "${WECHAT_MP_ENABLED:false}"
+    app-id: "${WECHAT_MP_APP_ID:}"
+    app-secret: "${WECHAT_MP_APP_SECRET:}"
+    token: "${WECHAT_MP_TOKEN:}"
+    encoding-aes-key: "${WECHAT_MP_ENCODING_AES_KEY:}"
+    oauth-callback-url: "${WECHAT_MP_OAUTH_CALLBACK_URL:https://zjwndj.com/api/wechat/oauth/callback}"
+    oauth-scope: "${WECHAT_MP_OAUTH_SCOPE:snsapi_base}"

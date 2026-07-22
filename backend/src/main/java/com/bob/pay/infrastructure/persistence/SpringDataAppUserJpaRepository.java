@@ -7,4 +7,6 @@ import java.util.Optional;
 public interface SpringDataAppUserJpaRepository extends JpaRepository<JpaAppUserEntity, String> {
 
     Optional<JpaAppUserEntity> findByUsername(String username);
+
+    Optional<JpaAppUserEntity> findByWechatOpenId(String wechatOpenId);
 }

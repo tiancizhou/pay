@@ -66,6 +66,43 @@ public class UserApplicationService {
                 .withoutPassword();
     }
 
+    public synchronized AppUser findOrCreateWechatUser(String openId, String unionId) {
+        if (openId == null || openId.isBlank()) {
+            throw new IllegalArgumentException("微信用户标识不能为空");
+        }
+        var existing = userRepository.findByWechatOpenId(openId);
+        if (existing.isPresent()) {
+            var user = existing.get();
+            if (unionId != null && !unionId.isBlank() && !unionId.equals(user.wechatUnionId())) {
+                user = userRepository.save(new AppUser(
+                        user.id(),
+                        user.username(),
+                        user.name(),
+                        user.phone(),
+                        user.role(),
+                        user.technicianId(),
+                        user.wechatOpenId(),
+                        unionId,
+                        user.passwordHash()
+                ));
+            }
+            return user.withoutPassword();
+        }
+
+        var suffix = UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+        return userRepository.save(new AppUser(
+                "wx-user-" + suffix,
+                "wx_" + suffix,
+                "微信用户",
+                "",
+                UserRole.CLIENT,
+                null,
+                openId,
+                unionId == null || unionId.isBlank() ? null : unionId,
+                passwordEncoder.encode(UUID.randomUUID().toString())
+        )).withoutPassword();
+    }
+
     public List<AppUser> listUsers() {
         return userRepository.findAll().stream().map(AppUser::withoutPassword).toList();
     }
@@ -136,6 +173,8 @@ public class UserApplicationService {
                 user.phone(),
                 user.role(),
                 user.technicianId(),
+                user.wechatOpenId(),
+                user.wechatUnionId(),
                 passwordEncoder.encode(command.password())
         )).withoutPassword();
     }

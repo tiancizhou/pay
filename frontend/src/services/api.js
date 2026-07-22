@@ -24,7 +24,10 @@ export const api = {
     body: JSON.stringify(payload)
   }),
   currentUser: (userId = '') => request(`/api/client/me${userId ? `?userId=${encodeURIComponent(userId)}` : ''}`),
+  wechatSession: () => request('/api/client/session'),
+  wechatLogout: () => request('/api/wechat/oauth/logout', { method: 'POST' }),
   clientSiteSettings: () => request('/api/client/site-settings'),
+  wechatConfig: () => request('/api/client/wechat/config'),
   listServices: () => request('/api/client/services'),
   listTechnicians: (serviceId, location) => {
     const query = location ? `?latitude=${location.latitude}&longitude=${location.longitude}` : ''

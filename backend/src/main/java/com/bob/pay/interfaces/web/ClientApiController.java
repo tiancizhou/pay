@@ -5,6 +5,7 @@ import com.bob.pay.application.ServiceCatalogApplicationService;
 import com.bob.pay.application.SiteSettingsApplicationService;
 import com.bob.pay.application.TechnicianApplicationService;
 import com.bob.pay.application.UserApplicationService;
+import com.bob.pay.config.WechatOfficialAccountProperties;
 import com.bob.pay.domain.model.order.GeoPoint;
 import com.bob.pay.domain.model.order.Order;
 import com.bob.pay.domain.model.service.ServiceItem;
@@ -31,19 +32,22 @@ public class ClientApiController {
     private final OrderApplicationService orderApplicationService;
     private final SiteSettingsApplicationService siteSettingsApplicationService;
     private final UserApplicationService userApplicationService;
+    private final WechatOfficialAccountProperties wechatOfficialAccountProperties;
 
     public ClientApiController(
             ServiceCatalogApplicationService serviceCatalogApplicationService,
             TechnicianApplicationService technicianApplicationService,
             OrderApplicationService orderApplicationService,
             SiteSettingsApplicationService siteSettingsApplicationService,
-            UserApplicationService userApplicationService
+            UserApplicationService userApplicationService,
+            WechatOfficialAccountProperties wechatOfficialAccountProperties
     ) {
         this.serviceCatalogApplicationService = serviceCatalogApplicationService;
         this.technicianApplicationService = technicianApplicationService;
         this.orderApplicationService = orderApplicationService;
         this.siteSettingsApplicationService = siteSettingsApplicationService;
         this.userApplicationService = userApplicationService;
+        this.wechatOfficialAccountProperties = wechatOfficialAccountProperties;
     }
 
     @GetMapping("/me")
@@ -57,6 +61,11 @@ public class ClientApiController {
     @GetMapping("/site-settings")
     public SiteSettingsApplicationService.SiteSettings siteSettings() {
         return siteSettingsApplicationService.getSettings();
+    }
+
+    @GetMapping("/wechat/config")
+    public WechatOfficialAccountProperties.PublicConfig wechatConfig() {
+        return wechatOfficialAccountProperties.publicConfig();
     }
 
     @GetMapping("/services")

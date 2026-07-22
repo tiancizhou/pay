@@ -34,10 +34,17 @@ services:
       DB_USERNAME: root
       DB_PASSWORD: ${MYSQL_ROOT_PASSWORD:?set MYSQL_ROOT_PASSWORD in .env}
       APP_UPLOAD_DIR: /app/uploads
+      WECHAT_MP_ENABLED: ${WECHAT_MP_ENABLED:-false}
+      WECHAT_MP_APP_ID: ${WECHAT_MP_APP_ID:-}
+      WECHAT_MP_APP_SECRET: ${WECHAT_MP_APP_SECRET:-}
+      WECHAT_MP_TOKEN: ${WECHAT_MP_TOKEN:-}
+      WECHAT_MP_ENCODING_AES_KEY: ${WECHAT_MP_ENCODING_AES_KEY:-}
+      WECHAT_MP_OAUTH_CALLBACK_URL: ${WECHAT_MP_OAUTH_CALLBACK_URL:-https://zjwndj.com/api/wechat/oauth/callback}
+      WECHAT_MP_OAUTH_SCOPE: ${WECHAT_MP_OAUTH_SCOPE:-snsapi_base}
       TZ: Asia/Shanghai
       JAVA_OPTS: ${JAVA_OPTS:-}
     ports:
-      - "${APP_PORT:-8080}:8080"
+      - "127.0.0.1:${APP_PORT:-8080}:8080"
     volumes:
       - app-uploads:/app/uploads
 

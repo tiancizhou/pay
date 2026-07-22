@@ -11,5 +11,7 @@ public interface AppUserRepository {
 
     Optional<AppUser> findByUsername(String username);
 
+    Optional<AppUser> findByWechatOpenId(String wechatOpenId);
+
     AppUser save(AppUser user);
 }

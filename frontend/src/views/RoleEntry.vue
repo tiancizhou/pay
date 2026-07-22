@@ -61,10 +61,31 @@ const form = reactive({
   password: ''
 })
 
-onMounted(() => {
+onMounted(async () => {
   const user = getPortalUser()
   if (user?.role) {
-    router.replace(roleHome(user))
+    await router.replace(roleHome(user))
+    return
+  }
+
+  if (!/MicroMessenger/i.test(window.navigator.userAgent)) return
+
+  try {
+    const sessionUser = await api.wechatSession()
+    setPortalUser(sessionUser)
+    await router.replace(roleHome(sessionUser))
+    return
+  } catch {
+    // No active WeChat session; continue with silent OAuth.
+  }
+
+  try {
+    const config = await api.wechatConfig()
+    if (config.enabled && config.configured) {
+      window.location.replace('/api/wechat/oauth/start?returnTo=%2Fclient')
+    }
+  } catch {
+    showToast('微信登录暂不可用，请稍后重试')
   }
 })
 

@@ -32,6 +32,11 @@ public class InMemoryAppUserRepository implements AppUserRepository {
     }
 
     @Override
+    public Optional<AppUser> findByWechatOpenId(String wechatOpenId) {
+        return users.stream().filter(user -> wechatOpenId.equals(user.wechatOpenId())).findFirst();
+    }
+
+    @Override
     public AppUser save(AppUser user) {
         for (int i = 0; i < users.size(); i++) {
             if (users.get(i).id().equals(user.id())) {

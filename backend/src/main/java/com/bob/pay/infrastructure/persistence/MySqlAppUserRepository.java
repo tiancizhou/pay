@@ -34,6 +34,11 @@ public class MySqlAppUserRepository implements AppUserRepository {
     }
 
     @Override
+    public Optional<AppUser> findByWechatOpenId(String wechatOpenId) {
+        return repository.findByWechatOpenId(wechatOpenId).map(this::toDomain);
+    }
+
+    @Override
     public AppUser save(AppUser user) {
         return toDomain(repository.save(toEntity(user)));
     }
@@ -46,6 +51,8 @@ public class MySqlAppUserRepository implements AppUserRepository {
                 entity.phone(),
                 entity.role(),
                 entity.technicianId(),
+                entity.wechatOpenId(),
+                entity.wechatUnionId(),
                 entity.passwordHash()
         );
     }
@@ -58,6 +65,8 @@ public class MySqlAppUserRepository implements AppUserRepository {
                 user.phone(),
                 user.role(),
                 user.role() == com.bob.pay.domain.model.user.UserRole.TECHNICIAN ? user.technicianId() : null,
+                user.wechatOpenId(),
+                user.wechatUnionId(),
                 user.passwordHash()
         );
     }

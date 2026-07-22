@@ -32,6 +32,12 @@ public class JpaAppUserEntity {
     @Column(length = 64)
     private String technicianId;
 
+    @Column(unique = true, length = 64)
+    private String wechatOpenId;
+
+    @Column(length = 64)
+    private String wechatUnionId;
+
     @Column(nullable = false, length = 120)
     private String passwordHash;
 
@@ -45,6 +51,8 @@ public class JpaAppUserEntity {
             String phone,
             UserRole role,
             String technicianId,
+            String wechatOpenId,
+            String wechatUnionId,
             String passwordHash
     ) {
         this.id = id;
@@ -53,6 +61,8 @@ public class JpaAppUserEntity {
         this.phone = phone;
         this.role = role;
         this.technicianId = technicianId;
+        this.wechatOpenId = wechatOpenId;
+        this.wechatUnionId = wechatUnionId;
         this.passwordHash = passwordHash;
     }
 
@@ -78,6 +88,14 @@ public class JpaAppUserEntity {
 
     public String technicianId() {
         return technicianId;
+    }
+
+    public String wechatOpenId() {
+        return wechatOpenId;
+    }
+
+    public String wechatUnionId() {
+        return wechatUnionId;
     }
 
     public String passwordHash() {

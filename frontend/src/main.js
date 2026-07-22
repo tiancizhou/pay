@@ -18,7 +18,8 @@ import AdminDashboard from './views/admin/AdminDashboard.vue'
 import TechnicianHome from './views/technician/TechnicianHome.vue'
 import RoleEntry from './views/RoleEntry.vue'
 import AdminLogin from './views/admin/AdminLogin.vue'
-import { getAdminUser, getPortalUser, roleHome } from './services/auth'
+import { api } from './services/api'
+import { getAdminUser, getPortalUser, roleHome, setPortalUser } from './services/auth'
 import './styles/main.css'
 
 const routes = [
@@ -42,7 +43,7 @@ const router = createRouter({
   scrollBehavior: () => ({ top: 0 })
 })
 
-router.beforeEach((to) => {
+router.beforeEach(async (to) => {
   if (to.path === '/') return true
   if (to.path === '/admin/login') return true
 
@@ -51,7 +52,15 @@ router.beforeEach((to) => {
     return admin?.role === 'ADMIN' ? true : '/admin/login'
   }
 
-  const user = getPortalUser()
+  let user = getPortalUser()
+  if (!user?.role && to.path.startsWith('/client')) {
+    try {
+      user = await api.wechatSession()
+      setPortalUser(user)
+    } catch {
+      return '/'
+    }
+  }
   if (!user?.role) return '/'
   if (to.path.startsWith('/technician') && user.role !== 'TECHNICIAN') return roleHome(user)
   if (to.path.startsWith('/client') && user.role !== 'CLIENT') return roleHome(user)

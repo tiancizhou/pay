@@ -50,14 +50,19 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import MobileShell from '../../components/MobileShell.vue'
+import { api } from '../../services/api'
 import { clearPortalUser } from '../../services/auth'
 
 const router = useRouter()
 const toast = ref('')
 
-function logout() {
-  clearPortalUser()
-  router.replace('/')
+async function logout() {
+  try {
+    await api.wechatLogout()
+  } finally {
+    clearPortalUser()
+    await router.replace('/')
+  }
 }
 
 function flash(message) {
